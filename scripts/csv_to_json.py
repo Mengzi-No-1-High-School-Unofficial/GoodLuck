@@ -10,12 +10,13 @@ CSV 格式要求:
     - 必须包含 "name" 或 "姓名" 列
     - 可选包含 "weight" 或 "权重" 列（默认为 1.0）
     - 可选包含 "id" 列（如果没有会自动生成）
+    - 可选包含 "info"、"班级"、"组别" 等列（附属信息）
 
 示例 CSV:
-    name,weight
-    张三,1.0
-    李四,2.0
-    王五,1.5
+    name,weight,info
+    张三,1.0,一班
+    李四,2.0,二班
+    王五,1.5,一班
 """
 
 import csv
@@ -78,6 +79,13 @@ def parse_csv(csv_file: Path) -> List[Dict[str, Any]]:
                 id_col = col
                 break
         
+        # 查找附属信息列
+        info_col = None
+        for col in fieldnames:
+            if col.lower() in ['info', '信息', 'class', '班级', 'group', '组别', 'grade', '年级']:
+                info_col = col
+                break
+        
         # 读取数据
         for index, row in enumerate(reader):
             name = row.get(name_col, '').strip()
@@ -99,11 +107,20 @@ def parse_csv(csv_file: Path) -> List[Dict[str, Any]]:
             if not student_id:
                 student_id = generate_id(index, name)
             
-            students.append({
+            # 获取附属信息
+            info = row.get(info_col, '').strip() if info_col else ''
+            
+            student = {
                 'id': student_id,
                 'name': name,
                 'weight': weight
-            })
+            }
+            
+            # 只在有附属信息时添加该字段
+            if info:
+                student['info'] = info
+            
+            students.append(student)
     
     return students
 

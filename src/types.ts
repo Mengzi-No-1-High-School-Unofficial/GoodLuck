@@ -2,7 +2,8 @@
 export interface Student {
     id: string;
     name: string;
-    weight: number; // 权重，默认为 1
+    weight: number;
+    info?: string; // 附属信息，如班级、组别等
 }
 
 // 配置文件接口

@@ -70,17 +70,20 @@ pnpm run build
     {
       "id": "student-1",
       "name": "张三",
-      "weight": 1.0
+      "weight": 1.0,
+      "info": "一班"
     },
     {
       "id": "student-2",
       "name": "李四",
-      "weight": 2.0
+      "weight": 2.0,
+      "info": "二班"
     },
     {
       "id": "student-3",
       "name": "王五",
-      "weight": 1.5
+      "weight": 1.5,
+      "info": "一班"
     }
   ]
 }
@@ -93,6 +96,7 @@ pnpm run build
   - `id` (必需): 学生唯一标识
   - `name` (必需): 学生姓名
   - `weight` (可选): 权重，默认为 1.0（权重越高，被抽中概率越大）
+  - `info` (可选): 附属信息，如班级、组别等（仅在抽选结果中显示）
 
 ### 使用 CSV 转换工具
 

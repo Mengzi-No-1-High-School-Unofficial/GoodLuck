@@ -83,6 +83,7 @@
           <div class="text-center">
             <div class="text-gray-500 text-sm mb-2 font-medium tracking-wide">抽选结果</div>
             <div class="text-6xl font-bold text-gray-900 tracking-tight">{{ currentPick.name }}</div>
+            <div v-if="currentPick.info" class="text-gray-500 text-lg mt-3">{{ currentPick.info }}</div>
           </div>
 
           <div class="flex justify-center pt-2">
@@ -107,7 +108,10 @@
         <div class="space-y-2">
           <div v-for="(record, index) in pickHistory.slice(0, 5)" :key="index"
             class="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg text-sm group hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-100 transition-all">
-            <span class="text-gray-900 font-semibold">{{ record.student.name }}</span>
+            <div class="flex flex-col">
+              <span class="text-gray-900 font-semibold">{{ record.student.name }}</span>
+              <span v-if="record.student.info" class="text-gray-500 text-xs mt-0.5">{{ record.student.info }}</span>
+            </div>
             <span class="text-gray-400 text-xs tabular-nums">{{ formatTime(record.timestamp) }}</span>
           </div>
         </div>

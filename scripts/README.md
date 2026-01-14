@@ -40,6 +40,13 @@ python3 scripts/csv_to_json.py <输入CSV文件> <输出JSON文件> [选项]
   - `id` 或 `student_id` 或 `学号`
   - 如果不提供，会自动生成（格式: `student-1`, `student-2`, ...）
 
+- **附属信息列**: 可包含以下列名之一
+  - `info` 或 `信息`
+  - `class` 或 `班级`
+  - `group` 或 `组别`
+  - `grade` 或 `年级`
+  - 此信息仅在抽选结果中显示，用于标识学生所属班级、组别等
+
 ### 分隔符
 
 脚本会自动检测 CSV 文件的分隔符（逗号、制表符等）。
@@ -50,10 +57,10 @@ python3 scripts/csv_to_json.py <输入CSV文件> <输出JSON文件> [选项]
 
 **students.csv**:
 ```csv
-name,weight
-张三,1.0
-李四,2.0
-王五,1.5
+name,weight,info
+张三,1.0,一班
+李四,2.0,二班
+王五,1.5,一班
 ```
 
 **转换命令**:
@@ -69,17 +76,20 @@ python3 scripts/csv_to_json.py students.csv output.json --title "三年级一班
     {
       "id": "student-1",
       "name": "张三",
-      "weight": 1.0
+      "weight": 1.0,
+      "info": "一班"
     },
     {
       "id": "student-2",
       "name": "李四",
-      "weight": 2.0
+      "weight": 2.0,
+      "info": "二班"
     },
     {
       "id": "student-3",
       "name": "王五",
-      "weight": 1.5
+      "weight": 1.5,
+      "info": "一班"
     }
   ]
 }
