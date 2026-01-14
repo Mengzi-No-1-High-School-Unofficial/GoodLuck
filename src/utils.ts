@@ -23,7 +23,7 @@ export function weightedRandomPick(students: Student[]): Student | null {
     }
 
     // 兜底返回最后一个学生
-    return students[students.length - 1];
+    return students[students.length - 1] ?? null;
 }
 
 /**

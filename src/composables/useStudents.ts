@@ -57,7 +57,7 @@ export function useStudents() {
     function updateStudent(id: string, updates: Partial<Student>) {
         const index = students.value.findIndex(s => s.id === id);
         if (index !== -1) {
-            students.value[index] = { ...students.value[index], ...updates };
+            students.value[index] = { ...students.value[index], ...updates } as Student;
             saveConfig();
         }
     }
