@@ -28,7 +28,7 @@ export function useStudents() {
     const error = ref<string>('');
 
     // 排除已抽选学生
-    const excludePicked = ref(false);
+    const excludePicked = ref(true);
 
     // 计算可用学生列表
     const availableStudents = computed(() => {
