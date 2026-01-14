@@ -94,6 +94,28 @@ pnpm run build
   - `name` (必需): 学生姓名
   - `weight` (可选): 权重，默认为 1.0（权重越高，被抽中概率越大）
 
+### 使用 CSV 转换工具
+
+如果您有 Excel 或 CSV 格式的学生名单，可以使用我们提供的转换工具：
+
+```bash
+# 基本用法
+python3 scripts/csv_to_json.py input.csv output.json
+
+# 指定标题
+python3 scripts/csv_to_json.py students.csv public/config.json --title "三年级一班"
+```
+
+CSV 文件格式示例：
+```csv
+name,weight
+张三,1.0
+李四,2.0
+王五,1.5
+```
+
+详细使用说明请查看 [scripts/README.md](scripts/README.md)。
+
 ## 加权随机算法
 
 系统使用加权随机算法确保抽选的公平性。每个学生被抽中的概率与其权重成正比。

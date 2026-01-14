@@ -27,9 +27,19 @@ export function useStudents() {
     // 错误信息
     const error = ref<string>('');
 
-    // 计算总权重
+    // 排除已抽选学生
+    const excludePicked = ref(false);
+
+    // 计算可用学生列表
+    const availableStudents = computed(() => {
+        if (!excludePicked.value) return students.value;
+        const pickedIds = new Set(pickHistory.value.map(h => h.student.id));
+        return students.value.filter(s => !pickedIds.has(s.id));
+    });
+
+    // 计算总权重 (基于可用学生)
     const totalWeight = computed(() =>
-        students.value.reduce((sum, s) => sum + s.weight, 0)
+        availableStudents.value.reduce((sum: number, s: Student) => sum + s.weight, 0)
     );
 
     // 添加学生
@@ -97,8 +107,8 @@ export function useStudents() {
 
     // 执行抽选
     async function performPick() {
-        if (students.value.length === 0) {
-            error.value = '没有可抽选的学生';
+        if (availableStudents.value.length === 0) {
+            error.value = excludePicked.value ? '所有学生都已抽选过，请重置历史记录' : '没有可抽选的学生';
             return;
         }
 
@@ -106,11 +116,11 @@ export function useStudents() {
         error.value = '';
         currentPick.value = null;
 
-        // 模拟抽选动画（2秒）
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // 模拟抽选动画（1秒）
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         // 执行加权随机抽选
-        const picked = weightedRandomPick(students.value);
+        const picked = weightedRandomPick(availableStudents.value);
 
         if (picked) {
             currentPick.value = picked;
@@ -120,8 +130,8 @@ export function useStudents() {
             });
 
             // 限制历史记录数量
-            if (pickHistory.value.length > 20) {
-                pickHistory.value = pickHistory.value.slice(0, 20);
+            if (!excludePicked.value && pickHistory.value.length > 50) {
+                pickHistory.value = pickHistory.value.slice(0, 50);
             }
         }
 
@@ -131,6 +141,7 @@ export function useStudents() {
     // 清空历史
     function clearHistory() {
         pickHistory.value = [];
+        currentPick.value = null;
     }
 
     // 重置当前抽选
@@ -148,6 +159,7 @@ export function useStudents() {
         currentPick,
         isPicking,
         error,
+        excludePicked,
         totalWeight,
         addStudent,
         updateStudent,

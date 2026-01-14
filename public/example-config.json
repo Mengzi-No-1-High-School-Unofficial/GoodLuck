@@ -25,6 +25,41 @@
             "id": "student-5",
             "name": "孙七",
             "weight": 3.0
+        },
+        {
+            "id": "student-6",
+            "name": "周八",
+            "weight": 1.0
+        },
+        {
+            "id": "student-7",
+            "name": "吴九",
+            "weight": 1.0
+        },
+        {
+            "id": "student-8",
+            "name": "郑十",
+            "weight": 1.0
+        },
+        {
+            "id": "student-9",
+            "name": "陈十一",
+            "weight": 1.0
+        },
+        {
+            "id": "student-10",
+            "name": "林十二",
+            "weight": 1.0
+        },
+        {
+            "id": "student-11",
+            "name": "徐十三",
+            "weight": 1.0
+        },
+        {
+            "id": "student-12",
+            "name": "曹十四",
+            "weight": 1.0
         }
     ]
 }
