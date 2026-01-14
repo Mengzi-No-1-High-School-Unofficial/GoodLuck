@@ -1,0 +1,30 @@
+{
+    "title": "示例班级抽选",
+    "students": [
+        {
+            "id": "student-1",
+            "name": "张三",
+            "weight": 1.0
+        },
+        {
+            "id": "student-2",
+            "name": "李四",
+            "weight": 2.0
+        },
+        {
+            "id": "student-3",
+            "name": "王五",
+            "weight": 1.5
+        },
+        {
+            "id": "student-4",
+            "name": "赵六",
+            "weight": 1.0
+        },
+        {
+            "id": "student-5",
+            "name": "孙七",
+            "weight": 3.0
+        }
+    ]
+}
