@@ -127,7 +127,7 @@
       </div>
 
       <!-- 开发者信息 -->
-      <div class="text-center text-gray-400 text-xs mt-8 pb-4">
+      <div class="text-center text-gray-400 mt-8 pb-4">
         <p>开发者：Xyber Nova &lt;xyber-nova@outlook.com&gt;（2503 何雨壕）</p>
         <p class="mt-1">本程序以 <a href="https://www.mozilla.org/en-US/MPL/2.0/" target="_blank"
             class="hover:text-gray-600 underline">MPL-2.0</a> 开源</p>
