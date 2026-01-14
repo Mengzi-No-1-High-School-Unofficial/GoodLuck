@@ -89,10 +89,10 @@ export function useStudents() {
     }
 
     // 从 URL 加载配置
-    async function loadFromUrl(url: string) {
+    async function loadFromUrl(url: string, password?: string) {
         try {
             error.value = '';
-            const config = await loadConfigFromUrl(url);
+            const config = await loadConfigFromUrl(url, password);
             students.value = config.students;
             if (config.title) {
                 title.value = config.title;

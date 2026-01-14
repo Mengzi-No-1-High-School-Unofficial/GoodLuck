@@ -13,6 +13,9 @@
           <input v-model="configUrl" type="text" placeholder="配置文件 URL"
             class="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-400"
             @keyup.enter="handleLoadFromUrl" />
+          <input v-model="password" type="password" placeholder="密码（可选）"
+            class="w-40 px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-400"
+            @keyup.enter="handleLoadFromUrl" />
           <button @click="handleLoadFromUrl" :disabled="loading" class="btn-primary px-6 py-2.5 disabled:opacity-50">
             {{ loading ? '加载中...' : '加载' }}
           </button>
@@ -20,6 +23,7 @@
 
         <p v-if="error" class="text-red-600 text-sm font-medium">{{ error }}</p>
         <p v-if="successMessage" class="text-green-600 text-sm font-medium">{{ successMessage }}</p>
+        <p v-if="isDecrypting" class="text-blue-600 text-sm font-medium">🔓 正在解密配置...</p>
       </div>
 
       <!-- 抽选设置 -->
@@ -140,9 +144,11 @@ const {
 } = useStudents();
 
 const configUrl = ref('');
+const password = ref('');
 const loading = ref(false);
 const successMessage = ref('');
 const isExpanded = ref(false);
+const isDecrypting = ref(false);
 
 const displayedStudents = computed(() => {
   if (isExpanded.value || students.value.length <= 10) {
@@ -154,6 +160,7 @@ const displayedStudents = computed(() => {
 watch(() => error.value, () => {
   if (error.value) {
     successMessage.value = '';
+    isDecrypting.value = false;
   }
 });
 
@@ -163,14 +170,22 @@ async function handleLoadFromUrl() {
 
   loading.value = true;
   successMessage.value = '';
+  isDecrypting.value = false;
 
-  const success = await loadFromUrl(configUrl.value.trim());
+  // 如果有密码，显示解密状态
+  if (password.value) {
+    isDecrypting.value = true;
+  }
+
+  const success = await loadFromUrl(configUrl.value.trim(), password.value || undefined);
 
   loading.value = false;
+  isDecrypting.value = false;
 
   if (success) {
-    successMessage.value = '配置加载成功';
+    successMessage.value = password.value ? '配置解密并加载成功' : '配置加载成功';
     configUrl.value = '';
+    password.value = '';
     setTimeout(() => {
       successMessage.value = '';
     }, 3000);

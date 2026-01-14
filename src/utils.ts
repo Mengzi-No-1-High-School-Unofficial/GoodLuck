@@ -29,15 +29,37 @@ export function weightedRandomPick(students: Student[]): Student | null {
 /**
  * 从 URL 加载配置文件
  * @param url 配置文件 URL
+ * @param password 可选密码（用于解密加密配置）
  * @returns 配置对象
  */
-export async function loadConfigFromUrl(url: string): Promise<Config> {
+export async function loadConfigFromUrl(url: string, password?: string): Promise<Config> {
     try {
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const config = await response.json();
+        const data = await response.json();
+
+        let config: Config;
+
+        // 检查是否为加密配置
+        if (isEncryptedConfig(data)) {
+            if (!password) {
+                throw new Error('此配置文件已加密，请输入密码');
+            }
+
+            // 解密配置
+            const decryptedJson = await decryptConfig(
+                data.data,
+                data.iv,
+                data.salt,
+                password
+            );
+            config = JSON.parse(decryptedJson);
+        } else {
+            // 明文配置
+            config = data;
+        }
 
         // 验证配置格式
         if (!config.students || !Array.isArray(config.students)) {
@@ -104,4 +126,82 @@ export function formatTimestamp(timestamp: number): string {
         minute: '2-digit',
         second: '2-digit',
     });
+}
+
+/**
+ * 检查配置是否加密
+ */
+export function isEncryptedConfig(data: any): boolean {
+    return (
+        typeof data === 'object' &&
+        data.encrypted === true &&
+        typeof data.version === 'string' &&
+        typeof data.algorithm === 'string' &&
+        typeof data.data === 'string' &&
+        typeof data.iv === 'string' &&
+        typeof data.salt === 'string'
+    );
+}
+
+/**
+ * Base64 字符串转 ArrayBuffer
+ */
+function base64ToArrayBuffer(base64: string): ArrayBuffer {
+    const binaryString = atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+
+/**
+ * 使用 Web Crypto API 解密配置
+ */
+export async function decryptConfig(
+    encryptedData: string,
+    iv: string,
+    salt: string,
+    password: string
+): Promise<string> {
+    try {
+        // Base64 解码
+        const ciphertext = base64ToArrayBuffer(encryptedData);
+        const ivBuffer = base64ToArrayBuffer(iv);
+        const saltBuffer = base64ToArrayBuffer(salt);
+
+        // 派生密钥
+        const passwordBuffer = new TextEncoder().encode(password);
+        const keyMaterial = await crypto.subtle.importKey(
+            'raw',
+            passwordBuffer,
+            'PBKDF2',
+            false,
+            ['deriveBits', 'deriveKey']
+        );
+
+        const key = await crypto.subtle.deriveKey(
+            {
+                name: 'PBKDF2',
+                salt: saltBuffer,
+                iterations: 100000,
+                hash: 'SHA-256'
+            },
+            keyMaterial,
+            { name: 'AES-GCM', length: 256 },
+            false,
+            ['decrypt']
+        );
+
+        // 解密
+        const decrypted = await crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: ivBuffer },
+            key,
+            ciphertext
+        );
+
+        return new TextDecoder().decode(decrypted);
+    } catch (error) {
+        throw new Error('解密失败：密码错误或文件已损坏');
+    }
 }
