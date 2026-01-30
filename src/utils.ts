@@ -62,19 +62,31 @@ export async function loadConfigFromUrl(url: string, password?: string): Promise
         }
 
         // 验证配置格式
-        if (!config.students || !Array.isArray(config.students)) {
-            throw new Error('配置格式错误：缺少 students 数组');
+        if (!config.students && !config.groups) {
+            throw new Error('配置格式错误：缺少 students 或 groups 数组');
         }
 
-        // 验证每个学生的数据
-        config.students.forEach((student: any, index: number) => {
-            if (!student.id || !student.name) {
-                throw new Error(`学生 ${index + 1} 数据不完整`);
-            }
-            if (typeof student.weight !== 'number' || student.weight <= 0) {
-                student.weight = 1; // 默认权重为 1
-            }
-        });
+        // 统一处理学生数据验证和权重
+        const processStudents = (students: any[]) => {
+            students.forEach((student: any, index: number) => {
+                if (!student.id || !student.name) {
+                    throw new Error(`学生 ${index + 1} 数据不完整`);
+                }
+                if (typeof student.weight !== 'number' || student.weight <= 0) {
+                    student.weight = 1; // 默认权重为 1
+                }
+            });
+        };
+
+        if (config.students) processStudents(config.students);
+        if (config.groups) {
+            config.groups.forEach(group => {
+                if (!group.name || !Array.isArray(group.students)) {
+                    throw new Error(`分组 ${group.name || '未知'} 格式错误`);
+                }
+                processStudents(group.students);
+            });
+        }
 
         return config;
     } catch (error) {

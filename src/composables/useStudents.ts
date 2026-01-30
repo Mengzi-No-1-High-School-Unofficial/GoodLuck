@@ -30,11 +30,27 @@ export function useStudents() {
     // 排除已抽选学生
     const excludePicked = ref(true);
 
+    // 当前选择的分组名
+    const currentGroupName = ref<string | null>(null);
+
     // 计算可用学生列表
     const availableStudents = computed(() => {
-        if (!excludePicked.value) return students.value;
+        let list = students.value;
+        if (currentGroupName.value) {
+            list = list.filter(s => s.group === currentGroupName.value);
+        }
+        if (!excludePicked.value) return list;
         const pickedIds = new Set(pickHistory.value.map(h => h.student.id));
-        return students.value.filter(s => !pickedIds.has(s.id));
+        return list.filter(s => !pickedIds.has(s.id));
+    });
+
+    // 所有可用分组
+    const allGroups = computed(() => {
+        const groups = new Set<string>();
+        students.value.forEach(s => {
+            if (s.group) groups.add(s.group);
+        });
+        return Array.from(groups).sort();
     });
 
     // 计算总权重 (基于可用学生)
@@ -81,22 +97,47 @@ export function useStudents() {
     function loadLocalConfig() {
         const config = loadConfigFromLocal();
         if (config) {
-            students.value = config.students;
-            if (config.title) {
-                title.value = config.title;
-            }
+            applyConfig(config);
         }
     }
 
-    // 从 URL 加载配置
+    // 应用配置到状态
+    function applyConfig(config: Config) {
+        let allStudents: Student[] = [];
+
+        // 处理扁平列表
+        if (config.students) {
+            allStudents = [...config.students];
+        }
+
+        // 处理分组列表
+        if (config.groups) {
+            config.groups.forEach(group => {
+                group.students.forEach(student => {
+                    allStudents.push({
+                        ...student,
+                        group: group.name
+                    });
+                });
+            });
+        }
+
+        students.value = allStudents;
+        if (config.title) {
+            title.value = config.title;
+        }
+
+        // 如果原分组不存在了，重置分组选择
+        if (currentGroupName.value && !allGroups.value.includes(currentGroupName.value)) {
+            currentGroupName.value = null;
+        }
+    }
+
     async function loadFromUrl(url: string, password?: string) {
         try {
             error.value = '';
             const config = await loadConfigFromUrl(url, password);
-            students.value = config.students;
-            if (config.title) {
-                title.value = config.title;
-            }
+            applyConfig(config);
             saveConfig();
             return true;
         } catch (e) {
@@ -160,6 +201,9 @@ export function useStudents() {
         isPicking,
         error,
         excludePicked,
+        currentGroupName,
+        allGroups,
+        availableStudents,
         totalWeight,
         addStudent,
         updateStudent,

@@ -28,20 +28,47 @@
       </div>
 
       <!-- 抽选设置 -->
-      <div v-if="students.length > 0"
-        class="card px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
-        <label class="flex items-center cursor-pointer select-none">
-          <div class="relative">
-            <input type="checkbox" v-model="excludePicked" class="sr-only" />
-            <div class="block bg-gray-200 w-10 h-6 rounded-full transition-colors"
-              :class="{ 'bg-blue-600': excludePicked }"></div>
-            <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform"
-              :class="{ 'translate-x-4': excludePicked }"></div>
+      <div v-if="students.length > 0" class="space-y-4">
+        <div v-if="allGroups.length > 0" class="card px-4 sm:px-6 py-4">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="text-gray-500 text-sm font-medium">抽选分组:</span>
+            <div class="flex flex-wrap gap-2">
+              <button @click="currentGroupName = null" :class="[
+                'px-4 py-1.5 rounded-full text-sm font-medium transition-all',
+                currentGroupName === null
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ]">
+                全部
+              </button>
+              <button v-for="group in allGroups" :key="group" @click="currentGroupName = group" :class="[
+                'px-4 py-1.5 rounded-full text-sm font-medium transition-all',
+                currentGroupName === group
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ]">
+                {{ group }}
+              </button>
+            </div>
           </div>
-          <span class="ml-3 text-gray-700 font-medium text-sm">不重复抽选</span>
-        </label>
-        <div class="text-gray-500 text-xs ml-13 sm:ml-0">
-          可用人员: {{ students.length - (excludePicked ? pickHistory.length : 0) }} / {{ students.length }}
+        </div>
+
+        <div
+          class="card px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+          <label class="flex items-center cursor-pointer select-none">
+            <div class="relative">
+              <input type="checkbox" v-model="excludePicked" class="sr-only" />
+              <div class="block bg-gray-200 w-10 h-6 rounded-full transition-colors"
+                :class="{ 'bg-blue-600': excludePicked }"></div>
+              <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform"
+                :class="{ 'translate-x-4': excludePicked }"></div>
+            </div>
+            <span class="ml-3 text-gray-700 font-medium text-sm">不重复抽选</span>
+          </label>
+          <div class="text-gray-500 text-xs ml-13 sm:ml-0">
+            可用人员: {{ availableStudents.length }} / {{currentGroupName ? students.filter(s => s.group ===
+              currentGroupName).length : students.length}}
+          </div>
         </div>
       </div>
 
@@ -49,7 +76,7 @@
       <div v-if="students.length > 0" class="card p-4 sm:p-6 space-y-4">
         <div class="flex items-center justify-between">
           <div class="text-gray-500 text-sm">
-            人员列表 ({{ students.length }})
+            人员列表 ({{currentGroupName ? students.filter(s => s.group === currentGroupName).length : students.length}})
           </div>
           <button v-if="students.length > 10" @click="isExpanded = !isExpanded"
             class="text-blue-600 text-xs font-medium hover:text-blue-700">
@@ -121,7 +148,7 @@
               <span v-if="record.student.info" class="text-gray-500 text-xs mt-0.5">{{ record.student.info }}</span>
             </div>
             <span class="text-gray-400 text-xs tabular-nums ml-2 flex-shrink-0">{{ formatTime(record.timestamp)
-              }}</span>
+            }}</span>
           </div>
         </div>
       </div>
@@ -149,6 +176,9 @@ const {
   isPicking,
   error,
   excludePicked,
+  currentGroupName,
+  allGroups,
+  availableStudents,
   loadFromUrl,
   performPick,
   clearHistory,
@@ -163,10 +193,14 @@ const isExpanded = ref(false);
 const isDecrypting = ref(false);
 
 const displayedStudents = computed(() => {
-  if (isExpanded.value || students.value.length <= 10) {
-    return students.value;
+  const list = currentGroupName.value
+    ? students.value.filter(s => s.group === currentGroupName.value)
+    : students.value;
+
+  if (isExpanded.value || list.length <= 10) {
+    return list;
   }
-  return students.value.slice(0, 10);
+  return list.slice(0, 10);
 });
 
 watch(() => error.value, () => {
