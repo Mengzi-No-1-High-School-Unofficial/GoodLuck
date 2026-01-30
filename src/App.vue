@@ -49,7 +49,7 @@
       <div v-if="students.length > 0" class="card p-4 sm:p-6 space-y-4">
         <div class="flex items-center justify-between">
           <div class="text-gray-500 text-sm">
-            学生列表 ({{ students.length }})
+            人员列表 ({{ students.length }})
           </div>
           <button v-if="students.length > 10" @click="isExpanded = !isExpanded"
             class="text-blue-600 text-xs font-medium hover:text-blue-700">
@@ -121,7 +121,7 @@
               <span v-if="record.student.info" class="text-gray-500 text-xs mt-0.5">{{ record.student.info }}</span>
             </div>
             <span class="text-gray-400 text-xs tabular-nums ml-2 flex-shrink-0">{{ formatTime(record.timestamp)
-              }}</span>
+            }}</span>
           </div>
         </div>
       </div>
