@@ -96,7 +96,11 @@ export function generateId(): string {
  * 保存配置到本地存储
  */
 export function saveConfigToLocal(config: Config): void {
-    localStorage.setItem('student-picker-config', JSON.stringify(config));
+    const json = JSON.stringify(config);
+    // 使用 btoa 进行 Base64 编码
+    // 注意：btoa 只支持 ASCII。对于 UTF-8 字符（如中文名字），需要先进行转义
+    const encoded = btoa(encodeURIComponent(json));
+    localStorage.setItem('student-picker-config', encoded);
 }
 
 /**
@@ -107,7 +111,14 @@ export function loadConfigFromLocal(): Config | null {
     if (!stored) return null;
 
     try {
-        return JSON.parse(stored);
+        // 首先尝试作为 Base64 解码
+        try {
+            const decoded = decodeURIComponent(atob(stored));
+            return JSON.parse(decoded);
+        } catch (e) {
+            // 如果解码或解析失败，尝试直接作为 JSON 解析（向下兼容旧格式）
+            return JSON.parse(stored);
+        }
     } catch {
         return null;
     }
