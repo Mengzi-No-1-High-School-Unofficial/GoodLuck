@@ -41,7 +41,7 @@
           <span class="ml-3 text-gray-700 font-medium text-sm">不重复抽选</span>
         </label>
         <div class="text-gray-500 text-xs ml-13 sm:ml-0">
-          可用学生: {{ students.length - (excludePicked ? pickHistory.length : 0) }} / {{ students.length }}
+          可用人员: {{ students.length - (excludePicked ? pickHistory.length : 0) }} / {{ students.length }}
         </div>
       </div>
 
@@ -121,7 +121,7 @@
               <span v-if="record.student.info" class="text-gray-500 text-xs mt-0.5">{{ record.student.info }}</span>
             </div>
             <span class="text-gray-400 text-xs tabular-nums ml-2 flex-shrink-0">{{ formatTime(record.timestamp)
-            }}</span>
+              }}</span>
           </div>
         </div>
       </div>
