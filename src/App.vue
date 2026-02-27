@@ -177,7 +177,9 @@
       <div class="text-center text-gray-400 mt-8 pb-4 text-sm">
         <p>开发者：Xyber Nova &lt;xyber-nova@outlook.com</p>
         <p class="mt-1">本程序以 <a href="https://www.mozilla.org/en-US/MPL/2.0/" target="_blank"
-            class="hover:text-gray-600 underline">MPL-2.0</a> 开源</p>
+            class="hover:text-gray-600 underline">MPL-2.0</a> 开源于 
+            <a href="https://github.com/Mengzi-No-1-High-School-Unofficial/GoodLuck" target="_blank" class="hover:text-gray-600 underline">GitHub</a>
+          </p>
       </div>
 
     </div>
