@@ -179,7 +179,12 @@
         <p class="mt-1">本程序以 <a href="https://www.mozilla.org/en-US/MPL/2.0/" target="_blank"
             class="hover:text-gray-600 underline">MPL-2.0</a> 开源于 
             <a href="https://github.com/Mengzi-No-1-High-School-Unofficial/GoodLuck" target="_blank" class="hover:text-gray-600 underline">GitHub</a>
-          </p>
+        </p>
+
+        <p class="mt-2 text-xs text-gray-500">
+          给个 Star ⭐ 喵！
+          关注 <a href="https://github.com/xyber-nova" target="_blank" class="hover:text-gray-600 underline">Xyber Nova</a> 谢谢喵！
+        </p>
       </div>
 
     </div>
