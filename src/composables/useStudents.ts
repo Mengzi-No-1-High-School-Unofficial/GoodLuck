@@ -19,7 +19,13 @@ export function useStudents() {
     const pickHistory = ref<PickHistory[]>([]);
 
     // 当前抽中的学生
-    const currentPick = ref<Student | null>(null);
+    const currentPicks = ref<Student[]>([]);
+
+    // 一次抽取人数
+    const pickCount = ref(1);
+
+    // 抽选提示信息
+    const pickNotice = ref('');
 
     // 是否正在抽选
     const isPicking = ref(false);
@@ -40,7 +46,11 @@ export function useStudents() {
             list = list.filter(s => s.group === currentGroupName.value);
         }
         if (!excludePicked.value) return list;
-        const pickedIds = new Set(pickHistory.value.map(h => h.student.id));
+        const pickedIds = new Set(
+            pickHistory.value.flatMap(h =>
+                h.students.map(student => student.id)
+            )
+        );
         return list.filter(s => !pickedIds.has(s.id));
     });
 
@@ -153,20 +163,44 @@ export function useStudents() {
             return;
         }
 
+        const normalizedPickCount = Number.isFinite(pickCount.value)
+            ? Math.max(1, Math.floor(pickCount.value))
+            : 1;
+        pickCount.value = normalizedPickCount;
+
+        const actualPickCount = Math.min(normalizedPickCount, availableStudents.value.length);
+
         isPicking.value = true;
         error.value = '';
-        currentPick.value = null;
+        pickNotice.value = '';
+        currentPicks.value = [];
+
+        if (actualPickCount < normalizedPickCount) {
+            pickNotice.value = `可用人员不足，已按 ${actualPickCount} 人抽选`;
+        }
 
         // 模拟抽选动画（1秒）
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // 执行加权随机抽选
-        const picked = weightedRandomPick(availableStudents.value);
+        const pool = [...availableStudents.value];
+        const pickedStudents: Student[] = [];
 
-        if (picked) {
-            currentPick.value = picked;
+        // 执行加权随机抽选（不放回）
+        for (let i = 0; i < actualPickCount; i++) {
+            const picked = weightedRandomPick(pool);
+            if (!picked) break;
+            pickedStudents.push(picked);
+
+            const pickedIndex = pool.findIndex(student => student.id === picked.id);
+            if (pickedIndex !== -1) {
+                pool.splice(pickedIndex, 1);
+            }
+        }
+
+        if (pickedStudents.length > 0) {
+            currentPicks.value = pickedStudents;
             pickHistory.value.unshift({
-                student: picked,
+                students: pickedStudents,
                 timestamp: Date.now(),
             });
 
@@ -182,12 +216,13 @@ export function useStudents() {
     // 清空历史
     function clearHistory() {
         pickHistory.value = [];
-        currentPick.value = null;
+        currentPicks.value = [];
+        pickNotice.value = '';
     }
 
     // 重置当前抽选
     function resetCurrentPick() {
-        currentPick.value = null;
+        currentPicks.value = [];
     }
 
     // 初始化时加载本地配置
@@ -197,7 +232,9 @@ export function useStudents() {
         students,
         title,
         pickHistory,
-        currentPick,
+        currentPicks,
+        pickCount,
+        pickNotice,
         isPicking,
         error,
         excludePicked,

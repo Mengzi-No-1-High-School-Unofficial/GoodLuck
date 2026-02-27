@@ -22,6 +22,6 @@ export interface Config {
 
 // 抽选历史记录
 export interface PickHistory {
-    student: Student;
+    students: Student[];
     timestamp: number;
 }
